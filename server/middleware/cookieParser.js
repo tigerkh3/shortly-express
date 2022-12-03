@@ -9,7 +9,6 @@ const parseCookies = (req, res, next) => {
     req.cookies = {};
 
   } else {
-    console.log('type of string', cookieString);
     // create cookies object
     var cookies = {};
 
@@ -26,7 +25,7 @@ const parseCookies = (req, res, next) => {
     // assign cookies object to request
     req['cookies'] = cookies;
   }
-  next(req);
+  next();
 };
 
 module.exports = parseCookies;
