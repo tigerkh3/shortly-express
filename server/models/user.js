@@ -34,9 +34,6 @@ class Users extends Model {
    * the record creation or rejected with the error that occured.
    */
   create({ username, password }) {
-    console.log('what is username here', username);
-    console.log('what is password here', password);
-
     let salt = utils.createRandom32String();
 
     let newUser = {
