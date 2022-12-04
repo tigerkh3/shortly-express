@@ -30,18 +30,33 @@ module.exports.createSession = (req, res, next) => {
   } else if (req.cookies.shortlyid) {
     models.Sessions.get({hash: req.cookies.shortlyid})
       .then ((result) => {
-        req.session = {};
-        req.session.hash = result.hash;
         if (result.userId) {
+          req.session = {};
+          console.log(req.session);
           req.session.userId = result.userId;
-          models.Users.get({id: result.userId})
-            .then((result) => {
-              req.session.user.username = result.username;
-              next();
-            });
+          req.session.user = result.user;
+          next();
         } else {
+          req.session = {};
+          req.session.hash = result.hash;
           next();
         }
+      })
+      .catch ( (err) => {
+        console.log('no such cookie');
+        res.clearCookie('shortlyid');
+        models.Sessions.create()
+          .then( (result) => {
+            var primaryKey = result.insertId;
+            models.Sessions.get({id: primaryKey})
+              .then( (result) => {
+                var hash = result.hash;
+                req.session = {};
+                req.session.hash = hash;
+                res.cookie('shortlyid', hash);
+                next();
+              });
+          });
       });
   }
   // if the cookie hash does not match anything we have on the session table
